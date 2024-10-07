@@ -1,0 +1,2 @@
+POSTGRES_DSN: "postgres://billion:billion@postgres:5432/billion?sslmode=disable"
+APP_DOMAIN: "http://localhost:3000"

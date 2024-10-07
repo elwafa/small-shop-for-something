@@ -1,0 +1,71 @@
+services:
+  golang-app:
+    env_file: .env
+    container_name: ${GOLANG_CONTAINER_NAME}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ENV: "${ENV}"
+    ports:
+      - '${GOLANG_APP_PORT}:8080'
+    networks:
+      - communication-network
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./:/golangApp
+
+  redis:
+    image: redis:alpine
+    container_name: ${REDIS_CONTAINER_NAME}
+    command: redis-server --appendonly yes --replica-read-only no
+    volumes:
+      - ./:/redis
+    ports:
+      - ${REDIS_PORT}:6379
+    networks:
+      - communication-network
+    healthcheck:
+      test: redis-cli -h redis -p 6379 ping
+      start_period: 3s
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+  migration:
+    image: migrate/migrate
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable",
+        "up"
+      ]
+    volumes:
+      - ./migrations:/migrations
+    networks:
+      - communication-network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:alpine
+    container_name: ${POSTGRES_CONTAINER_NAME}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - "./:/var/lib/data"
+    ports:
+      - '${POSTGRES_PORT}:5432'
+    networks:
+      - communication-network
+
+networks:
+  communication-network:
+    name: ${COMMUNICATION_NETWORK_NAME}
+    external: true
