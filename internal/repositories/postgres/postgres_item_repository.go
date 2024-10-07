@@ -99,10 +99,24 @@ func (r *ItemRepo) DeleteItem(ctx context.Context, itemID int) error {
 	return nil
 }
 
-func (r *ItemRepo) GetPaginationItems(ctx context.Context, limit, page int) ([]entities.Item, error) {
-	rows, err := r.DB.QueryContext(ctx, "SELECT * FROM items LIMIT $1 OFFSET $2", limit, (page-1)*limit)
+func (r *ItemRepo) GetPaginationItems(ctx context.Context, limit, page int, sort, name string) ([]entities.Item, int, error) {
+	// check if name is empty
+	query := "SELECT id, name,description,price,picture,status,receive,user_id FROM items"
+	rows := &sql.Rows{}
+	var err error
+	var total int
+	var totalCount *sql.Row
+	if name != "" {
+		query += " WHERE name like $1 ORDER BY created_at " + sort + " LIMIT $2 OFFSET $3"
+		rows, err = r.DB.QueryContext(ctx, query, "%"+name+"%", limit, (page-1)*limit)
+		totalCount = r.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM items WHERE name like $1 ORDER BY $2 LIMIT $3 OFFSET $4", "%"+name+"%", sort, limit, (page-1)*limit)
+	} else {
+		query += " ORDER BY created_at " + sort + " LIMIT $1 OFFSET $2"
+		rows, err = r.DB.QueryContext(ctx, query, limit, (page-1)*limit)
+		totalCount = r.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM items ORDER BY $1 LIMIT $2 OFFSET $3", sort, limit, (page-1)*limit)
+	}
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 	var items []entities.Item
@@ -110,11 +124,12 @@ func (r *ItemRepo) GetPaginationItems(ctx context.Context, limit, page int) ([]e
 		var item entities.Item
 		err = rows.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Picture, &item.Status, &item.Receive, &item.UserId)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		items = append(items, item)
 	}
-	return items, nil
+	err = totalCount.Scan(&total)
+	return items, total, nil
 }
 
 func (r *ItemRepo) GetPaginationItemsByUser(ctx context.Context, userId, limit, page int) ([]entities.Item, error) {
@@ -137,6 +152,16 @@ func (r *ItemRepo) GetPaginationItemsByUser(ctx context.Context, userId, limit, 
 
 func (r *ItemRepo) GetTotalItemsByUser(ctx context.Context, userId int) (int, error) {
 	row := r.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM items WHERE user_id=$1", userId)
+	var total int
+	err := row.Scan(&total)
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
+}
+
+func (r *ItemRepo) GetTotalItems(ctx context.Context) (int, error) {
+	row := r.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM items")
 	var total int
 	err := row.Scan(&total)
 	if err != nil {

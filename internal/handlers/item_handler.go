@@ -70,7 +70,7 @@ func (h *ItemHandler) StoreItem(c *gin.Context) {
 
 }
 
-func (h *ItemHandler) GetItems(c *gin.Context) {
+func (h *ItemHandler) GetItemsForSeller(c *gin.Context) {
 	// get itesm from service for seller
 	userId := c.MustGet("userId").(int)
 	page, err := strconv.Atoi(c.Query("page"))
@@ -96,6 +96,55 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	// if total items is not divisible by limit, add 1 to total pages
 	totalPages := total % limit
 	fmt.Println(totalPages, total, limit, "totalPages")
+	if totalPages > 0 {
+		totalPages = total/limit + 1
+	} else {
+		totalPages = total / limit
+	}
+	// claculate last page
+	lastPage := page
+	if page > 1 {
+		lastPage = totalPages
+	}
+	pagination := map[string]int{
+		"current":     page,
+		"limit":       limit,
+		"total_items": total,
+		"total_pages": totalPages,
+		"lastPage":    lastPage,
+	}
+	c.JSON(http.StatusOK, gin.H{"items": items, "pagination": pagination})
+}
+
+func (h *ItemHandler) GetItemsForCustomer(c *gin.Context) {
+	// get items from service for customer
+	page, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		page = 1
+	}
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		limit = 10
+	}
+	sort := c.Query("sort")
+	if sort != "ASC" && sort != "DESC" {
+		sort = "ASC"
+	}
+	name := c.Query("name")
+	items, total, err := h.service.GetItemsForCustomer(c, limit, page, sort, name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	// add app domain to the picture path
+	for i := range items {
+		items[i].Picture = h.AppDomain + "/" + items[i].Picture
+	}
+	// add pagination to the response
+
+	// calculate total pages
+	// if total items is not divisible by limit, add 1 to total pages
+	totalPages := total % limit
 	if totalPages > 0 {
 		totalPages = total/limit + 1
 	} else {
