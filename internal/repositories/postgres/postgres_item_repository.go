@@ -118,7 +118,7 @@ func (r *ItemRepo) GetPaginationItems(ctx context.Context, limit, page int) ([]e
 }
 
 func (r *ItemRepo) GetPaginationItemsByUser(ctx context.Context, userId, limit, page int) ([]entities.Item, error) {
-	rows, err := r.DB.QueryContext(ctx, "SELECT * FROM items WHERE user_id=$1 LIMIT $2 OFFSET $3", userId, limit, (page-1)*limit)
+	rows, err := r.DB.QueryContext(ctx, "SELECT id, name,description,price,picture,status,receive,user_id FROM items WHERE user_id=$1 LIMIT $2 OFFSET $3", userId, limit, (page-1)*limit)
 	if err != nil {
 		return nil, err
 	}
@@ -133,4 +133,14 @@ func (r *ItemRepo) GetPaginationItemsByUser(ctx context.Context, userId, limit, 
 		items = append(items, item)
 	}
 	return items, nil
+}
+
+func (r *ItemRepo) GetTotalItemsByUser(ctx context.Context, userId int) (int, error) {
+	row := r.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM items WHERE user_id=$1", userId)
+	var total int
+	err := row.Scan(&total)
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
 }

@@ -15,4 +15,5 @@ type ItemRepository interface {
 	DeleteItem(ctx context.Context, itemID int) error
 	GetPaginationItems(ctx context.Context, limit, page int) ([]entities.Item, error)
 	GetPaginationItemsByUser(ctx context.Context, userId, limit, page int) ([]entities.Item, error)
+	GetTotalItemsByUser(ctx context.Context, userId int) (int, error)
 }

@@ -21,3 +21,12 @@ func (s *ItemService) StoreItem(ctx context.Context, item *entities.Item) (*enti
 	}
 	return itemDb, nil
 }
+
+func (s *ItemService) GetItemsForSeller(ctx context.Context, limit, page, userId int) ([]entities.Item, int, error) {
+	items, err := s.repo.GetPaginationItemsByUser(ctx, userId, limit, page)
+	if err != nil {
+		return nil, 0, err
+	}
+	total, err := s.repo.GetTotalItemsByUser(ctx, userId)
+	return items, total, nil
+}

@@ -26,4 +26,5 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 	seller.Use(middleware.AuthMiddleware())
 	items := seller.Group("/items")
 	items.POST("/", handler.ItemHandler.StoreItem)
+	items.GET("/", handler.ItemHandler.GetItems)
 }
