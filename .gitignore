@@ -4,3 +4,4 @@ node_modules
 .vscode
 config/config.yaml
 migrate
+cmd/app/app
