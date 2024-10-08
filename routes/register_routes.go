@@ -2,19 +2,37 @@ package routes
 
 import (
 	"github.com/elwafa/billion-data/internal/handlers"
+	"github.com/elwafa/billion-data/internal/handlers/web"
 	"github.com/elwafa/billion-data/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	UserHandler  *handlers.UserHandler
-	AuthHandler  *handlers.AuthHandler
-	ItemHandler  *handlers.ItemHandler
-	CardHandler  *handlers.CardHandler
-	OrderHandler *handlers.OrderHandler
+	UserHandler      *handlers.UserHandler
+	AuthHandler      *handlers.AuthHandler
+	ItemHandler      *handlers.ItemHandler
+	CardHandler      *handlers.CardHandler
+	OrderHandler     *handlers.OrderHandler
+	DashboardHandler *web.DashboardHandler
 }
 
 func RegisterRoutes(router *gin.Engine, handler *Handler) {
+	// handle static files
+	router.Static("/assets", "./assets")
+	// templates
+	router.LoadHTMLGlob("templates/*")
+	// Guest Group
+	guest := router.Group("/")
+	guest.Use(middleware.WebGuest())
+	// handle web login
+	guest.GET("/", handler.AuthHandler.RenderWebLogin)
+	guest.POST("/", handler.AuthHandler.WebLogin)
+
+	// handle Dashboard pages
+	dashboard := router.Group("/dashboard")
+	dashboard.Use(middleware.WebAuth())
+	dashboard.GET("/", handler.DashboardHandler.RenderDashboard)
+	//dashboard.GET("/", handler.DashboardHandler.RenderDashboard)
 	// handle uploads
 	router.Static("/uploads", "./uploads")
 

@@ -4,6 +4,7 @@ import (
 	"github.com/elwafa/billion-data/config"
 	"github.com/elwafa/billion-data/internal/db/sql"
 	"github.com/elwafa/billion-data/internal/handlers"
+	"github.com/elwafa/billion-data/internal/handlers/web"
 	"github.com/elwafa/billion-data/internal/repositories/postgres"
 	"github.com/elwafa/billion-data/internal/services"
 	"github.com/elwafa/billion-data/routes"
@@ -40,13 +41,15 @@ func Run() {
 	itemHandler := handlers.NewItemHandler(itemService, cfg.APPDomain)
 	cardHandler := handlers.NewCardHandler(cardService, cfg.APPDomain)
 	orderHandler := handlers.NewOrderHandler(orderService, cardService, cfg.APPDomain)
+	dashboadHandler := web.NewDashboardHandler(userService)
 
 	h := &routes.Handler{
-		UserHandler:  userHandler,
-		AuthHandler:  authHandler,
-		ItemHandler:  itemHandler,
-		CardHandler:  cardHandler,
-		OrderHandler: orderHandler,
+		UserHandler:      userHandler,
+		AuthHandler:      authHandler,
+		ItemHandler:      itemHandler,
+		CardHandler:      cardHandler,
+		OrderHandler:     orderHandler,
+		DashboardHandler: dashboadHandler,
 	}
 
 	router := gin.Default()
