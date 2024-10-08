@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/elwafa/billion-data/internal/services"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 )
 
@@ -57,8 +56,7 @@ func (h *AuthHandler) WebLogin(ctx *gin.Context) {
 	email := ctx.PostForm("email")
 	password := ctx.PostForm("password")
 	// bind the request from html form
-	user, err := h.service.AdminLogin(ctx, email, password)
-	log.Println("user", user, "err", err, "handler")
+	_, err := h.service.AdminLogin(ctx, email, password)
 	if err != nil {
 		// redirect to login page with error message
 		ctx.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
