@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"errors"
+	"github.com/elwafa/billion-data/internal/entities"
+	"github.com/elwafa/billion-data/internal/repositories"
 	"github.com/elwafa/billion-data/internal/services"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -9,11 +12,12 @@ import (
 )
 
 type CardHandler struct {
-	service *services.CardService
+	service   *services.CardService
+	appDomain string
 }
 
-func NewCardHandler(service *services.CardService) *CardHandler {
-	return &CardHandler{service: service}
+func NewCardHandler(service *services.CardService, appDomain string) *CardHandler {
+	return &CardHandler{service: service, appDomain: appDomain}
 }
 
 func (h *CardHandler) AddToCard(ctx *gin.Context) {
@@ -32,4 +36,24 @@ func (h *CardHandler) AddToCard(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "Item added successfully"})
+}
+
+func (h *CardHandler) GetCard(ctx *gin.Context) {
+	userID := ctx.GetInt("userId")
+	card, err := h.service.GetCard(ctx, userID)
+	if errors.Is(err, repositories.ErrRecodeNotFound) {
+		ctx.JSON(http.StatusOK, gin.H{"card": entities.Card{}})
+		return
+	}
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	// handle Item Picture
+	items := card.Items
+	for _, item := range items {
+		item.Item.Picture = h.appDomain + "/" + item.Item.Picture
+		log.Println(item.Item.Picture)
+	}
+	ctx.JSON(http.StatusOK, card)
 }

@@ -10,6 +10,6 @@ type CardRepository interface {
 	StoreCard(ctx context.Context, card *entities.Card) (*entities.Card, error)
 	AddToCard(ctx context.Context, cardItem *entities.CardItem) error
 	CheckItemExistsInCard(ctx context.Context, cardId, itemId int) (*entities.CardItem, error)
-	GetCard() error
+	GetCard(ctx context.Context, userId int) (*entities.Card, error)
 	RemoveFromCard() error
 }

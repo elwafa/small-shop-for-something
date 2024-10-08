@@ -59,3 +59,7 @@ func (s *CardService) createCardForUser(ctx context.Context, userId int) (*entit
 	}
 	return card, nil
 }
+
+func (s *CardService) GetCard(ctx context.Context, userId int) (*entities.Card, error) {
+	return s.repo.GetCard(ctx, userId)
+}
