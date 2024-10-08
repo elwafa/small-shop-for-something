@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/elwafa/billion-data/internal/entities"
 	"github.com/elwafa/billion-data/internal/repositories"
-	"log"
 )
 
 type OrderService struct {
@@ -27,8 +26,6 @@ func (s *OrderService) StoreOrder(ctx context.Context, userId int) (*entities.Or
 	if err != nil {
 		return nil, 0, err
 	}
-	log.Println("cardAndItems", cardAndItems)
-
 	order := &entities.Order{
 		UserID: cardAndItems.UserID,
 		Status: "pending",
