@@ -42,7 +42,7 @@ services:
         "-path",
         "/migrations",
         "-database",
-        "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable",
+        "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable",
         "up"
       ]
     volumes:
