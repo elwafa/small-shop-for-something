@@ -164,3 +164,21 @@ func (h *ItemHandler) GetItemsForCustomer(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"items": items, "pagination": pagination})
 }
+
+func (h *ItemHandler) GetItemForCustomer(c *gin.Context) {
+	// get item from service for customer
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	item, err := h.service.GetItemForCustomer(c, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	// add app domain to the picture path
+	item.Picture = h.AppDomain + "/" + item.Picture
+	c.JSON(http.StatusOK, gin.H{"item": item})
+
+}

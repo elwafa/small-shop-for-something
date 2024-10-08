@@ -26,6 +26,7 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 	customer.Use(middleware.AuthMiddleware())
 	customerItems := customer.Group("/items")
 	customerItems.GET("/", handler.ItemHandler.GetItemsForCustomer)
+	customerItems.GET("/:id", handler.ItemHandler.GetItemForCustomer)
 
 	// groups seller
 	seller := router.Group("/seller")
