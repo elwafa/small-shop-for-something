@@ -29,20 +29,24 @@ func Run() {
 	userRepo := postgres.NewPostgresUserRepository(postgresDb)
 	itemRepo := postgres.NewPostgresItemRepository(postgresDb)
 	cardRepo := postgres.NewPostgresCardRepository(postgresDb)
+	orderRepo := postgres.NewPostgresOrderRepository(postgresDb)
 	userService := services.NewUserService(userRepo)
 	authService := services.NewAuthService(userRepo)
 	itemService := services.NewItemService(itemRepo)
 	cardService := services.NewCardService(cardRepo)
+	orderService := services.NewOrderService(orderRepo, cardRepo)
 	userHandler := handlers.NewUserHandler(userService, authService)
 	authHandler := handlers.NewAuthHandler(authService)
 	itemHandler := handlers.NewItemHandler(itemService, cfg.APPDomain)
 	cardHandler := handlers.NewCardHandler(cardService, cfg.APPDomain)
+	orderHandler := handlers.NewOrderHandler(orderService, cardService)
 
 	h := &routes.Handler{
-		UserHandler: userHandler,
-		AuthHandler: authHandler,
-		ItemHandler: itemHandler,
-		CardHandler: cardHandler,
+		UserHandler:  userHandler,
+		AuthHandler:  authHandler,
+		ItemHandler:  itemHandler,
+		CardHandler:  cardHandler,
+		OrderHandler: orderHandler,
 	}
 
 	router := gin.Default()

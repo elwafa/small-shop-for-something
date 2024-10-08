@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/elwafa/billion-data/internal/entities"
 	"github.com/elwafa/billion-data/internal/repositories"
+	"log"
 )
 
 type CardRepository struct {
@@ -95,6 +96,7 @@ func (r *CardRepository) GetCard(ctx context.Context, userId int) (*entities.Car
 	err := row.Scan(&card.ID, &card.UserID, &card.Status)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			log.Println("no pending card found", userId)
 			return nil, repositories.ErrRecodeNotFound
 		}
 		return nil, err
@@ -121,5 +123,13 @@ func (r *CardRepository) GetCard(ctx context.Context, userId int) (*entities.Car
 }
 
 func (r *CardRepository) RemoveFromCard() error {
+	return nil
+}
+
+func (r *CardRepository) UpdateCard(ctx context.Context, id int) error {
+	_, err := r.db.Exec("UPDATE card SET status = 'finished' WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
