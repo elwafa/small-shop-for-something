@@ -65,5 +65,5 @@ func (h *AuthHandler) WebLogin(ctx *gin.Context) {
 		return
 	}
 	// redirect to dashboard
-	ctx.HTML(http.StatusFound, "/dashboard", gin.H{"user": user})
+	ctx.Redirect(http.StatusFound, "/dashboard")
 }
