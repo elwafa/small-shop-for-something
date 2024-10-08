@@ -10,6 +10,7 @@ type Handler struct {
 	UserHandler *handlers.UserHandler
 	AuthHandler *handlers.AuthHandler
 	ItemHandler *handlers.ItemHandler
+	CardHandler *handlers.CardHandler
 }
 
 func RegisterRoutes(router *gin.Engine, handler *Handler) {
@@ -27,6 +28,9 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 	customerItems := customer.Group("/items")
 	customerItems.GET("/", handler.ItemHandler.GetItemsForCustomer)
 	customerItems.GET("/:id", handler.ItemHandler.GetItemForCustomer)
+	// customer card
+	customerCard := customer.Group("/card")
+	customerCard.POST("/:item-id", handler.CardHandler.AddToCard)
 
 	// groups seller
 	seller := router.Group("/seller")
