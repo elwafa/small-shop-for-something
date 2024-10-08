@@ -38,3 +38,11 @@ func (s *ItemService) GetItemsForCustomer(ctx context.Context, limit, page int, 
 	}
 	return items, total, nil
 }
+
+func (s *ItemService) GetItemForCustomer(ctx context.Context, id int) (entities.Item, error) {
+	item, err := s.repo.GetItem(ctx, id)
+	if err != nil {
+		return entities.Item{}, err
+	}
+	return *item, nil
+}

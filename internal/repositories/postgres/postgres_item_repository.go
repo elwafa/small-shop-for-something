@@ -3,7 +3,9 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/elwafa/billion-data/internal/entities"
+	"github.com/elwafa/billion-data/internal/repositories"
 )
 
 type ItemRepo struct {
@@ -62,14 +64,17 @@ func (r *ItemRepo) GetItemsByUser(ctx context.Context, userId, limit int) ([]ent
 	return items, nil
 }
 
-func (r *ItemRepo) GetItem(ctx context.Context, itemID int) (entities.Item, error) {
-	row := r.DB.QueryRowContext(ctx, "SELECT * FROM items WHERE id=$1", itemID)
+func (r *ItemRepo) GetItem(ctx context.Context, itemID int) (*entities.Item, error) {
+	row := r.DB.QueryRowContext(ctx, "SELECT id,name,description,price,picture,status,receive,user_id FROM items WHERE id=$1", itemID)
 	var item entities.Item
 	err := row.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Picture, &item.Status, &item.Receive, &item.UserId)
 	if err != nil {
-		return entities.Item{}, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return &entities.Item{}, repositories.ErrRecodeNotFound
+		}
+		return &entities.Item{}, err
 	}
-	return item, nil
+	return &item, nil
 }
 
 func (r *ItemRepo) GetItemByUser(ctx context.Context, userId, itemID int) (entities.Item, error) {
