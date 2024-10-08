@@ -34,5 +34,5 @@ func (h *OrderHandler) StoreOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, order)
+	ctx.JSON(http.StatusOK, gin.H{"message": "order created", "order": order})
 }
