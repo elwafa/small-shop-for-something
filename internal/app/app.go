@@ -28,17 +28,21 @@ func Run() {
 	// register the user repository
 	userRepo := postgres.NewPostgresUserRepository(postgresDb)
 	itemRepo := postgres.NewPostgresItemRepository(postgresDb)
+	cardRepo := postgres.NewPostgresCardRepository(postgresDb)
 	userService := services.NewUserService(userRepo)
 	authService := services.NewAuthService(userRepo)
 	itemService := services.NewItemService(itemRepo)
+	cardService := services.NewCardService(cardRepo)
 	userHandler := handlers.NewUserHandler(userService, authService)
 	authHandler := handlers.NewAuthHandler(authService)
 	itemHandler := handlers.NewItemHandler(itemService, cfg.APPDomain)
+	cardHandler := handlers.NewCardHandler(cardService)
 
 	h := &routes.Handler{
 		UserHandler: userHandler,
 		AuthHandler: authHandler,
 		ItemHandler: itemHandler,
+		CardHandler: cardHandler,
 	}
 
 	router := gin.Default()
