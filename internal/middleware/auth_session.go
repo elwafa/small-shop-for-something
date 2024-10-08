@@ -14,7 +14,7 @@ func WebAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session, _ := store.Get(c.Request, "session")
 		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-			c.Redirect(http.StatusFound, "/login")
+			c.Redirect(http.StatusFound, "/")
 			c.Abort()
 			return
 		}

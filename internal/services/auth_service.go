@@ -7,6 +7,7 @@ import (
 	"github.com/elwafa/billion-data/internal/entities"
 	"github.com/elwafa/billion-data/internal/repositories"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 var (
@@ -43,6 +44,7 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (entiti
 // admin login
 func (s *AuthService) AdminLogin(ctx *gin.Context, email, password string) (entities.User, error) {
 	user, err := s.repo.GetUserByEmail(ctx, email)
+	log.Println("user", user, "err", err)
 	if err != nil {
 		if errors.Is(err, repositories.ErrRecodeNotFound) {
 			return user, ErrInvalidCredential
@@ -50,11 +52,14 @@ func (s *AuthService) AdminLogin(ctx *gin.Context, email, password string) (enti
 		return user, err
 	}
 	checkPass := entities.CheckPasswordHash(password, user.Password)
+	log.Println("checkPass", checkPass)
 	if !checkPass {
 		return user, ErrInvalidCredential
 	}
 	if user.Type != "admin" {
+		log.Println("user type", user.Type)
 		return user, ErrInvalidCredential
 	}
+	log.Println("user", user)
 	return user, auth.AdminLoginWeb(ctx, user)
 }
