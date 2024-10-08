@@ -47,3 +47,21 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Login successfully", "token": token, "user": userResponse})
 }
+
+func (h *AuthHandler) RenderWebLogin(ctx *gin.Context) {
+	ctx.HTML(http.StatusOK, "login.html", nil)
+}
+
+func (h *AuthHandler) WebLogin(ctx *gin.Context) {
+	email := ctx.PostForm("email")
+	password := ctx.PostForm("password")
+	// bind the request from html form
+	user, err := h.service.AdminLogin(ctx, email, password)
+	if err != nil {
+		// redirect to login page with error message
+		ctx.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
+		return
+	}
+	// redirect to dashboard
+	ctx.HTML(http.StatusFound, "/dashboard", gin.H{"user": user})
+}

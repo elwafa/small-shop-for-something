@@ -35,3 +35,11 @@ func (s *UserService) StoreUser(ctx context.Context, user *entities.User) error 
 	}
 	return nil
 }
+
+func (s *UserService) GetUserByID(ctx context.Context, id int) (entities.User, error) {
+	user, err := s.repo.GetUser(ctx, id)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
