@@ -39,7 +39,7 @@ func Run() {
 	authHandler := handlers.NewAuthHandler(authService)
 	itemHandler := handlers.NewItemHandler(itemService, cfg.APPDomain)
 	cardHandler := handlers.NewCardHandler(cardService, cfg.APPDomain)
-	orderHandler := handlers.NewOrderHandler(orderService, cardService)
+	orderHandler := handlers.NewOrderHandler(orderService, cardService, cfg.APPDomain)
 
 	h := &routes.Handler{
 		UserHandler:  userHandler,

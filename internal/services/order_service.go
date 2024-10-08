@@ -43,3 +43,11 @@ func (s *OrderService) StoreOrder(ctx context.Context, userId int) (*entities.Or
 	}
 	return order, card.ID, nil
 }
+
+func (s *OrderService) GetOrders(ctx context.Context, userId int) ([]*entities.Order, error) {
+	orders, err := s.repo.GetOrders(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
+}

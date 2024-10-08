@@ -5,4 +5,5 @@ type OrderItem struct {
 	OrderID int    `json:"order_id"`
 	ItemID  int    `json:"item_id"`
 	Status  string `json:"status"`
+	Item    *Item  `json:"item"`
 }

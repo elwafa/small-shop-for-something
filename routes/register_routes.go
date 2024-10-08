@@ -36,6 +36,7 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 	// customer order
 	customerOrder := customer.Group("/order")
 	customerOrder.POST("/", handler.OrderHandler.StoreOrder)
+	customerOrder.GET("/", handler.OrderHandler.GetOrders)
 
 	// groups seller
 	seller := router.Group("/seller")
