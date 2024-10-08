@@ -88,8 +88,36 @@ func (r *CardRepository) CheckItemExistsInCard(ctx context.Context, cardId, item
 	return cardItem, nil
 }
 
-func (r *CardRepository) GetCard() error {
-	return nil
+func (r *CardRepository) GetCard(ctx context.Context, userId int) (*entities.Card, error) {
+	// get card by user id and card Items
+	card := &entities.Card{}
+	row := r.db.QueryRowContext(ctx, "SELECT id,user_id,status FROM card WHERE user_id = $1 AND status = 'pending'", userId)
+	err := row.Scan(&card.ID, &card.UserID, &card.Status)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, repositories.ErrRecodeNotFound
+		}
+		return nil, err
+	}
+	// get card items and items
+	rows, err := r.db.QueryContext(ctx, "SELECT ci.id,ci.card_id,ci.item_id,i.name,i.description,i.price,i.picture,i.status,i.receive,i.user_id FROM card_item ci JOIN items i ON ci.item_id = i.id WHERE ci.card_id = $1", card.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var cardItems []entities.CardItem
+	for rows.Next() {
+		var cardItem entities.CardItem
+		var item entities.Item
+		err = rows.Scan(&cardItem.ID, &cardItem.CardID, &cardItem.ItemID, &item.Name, &item.Description, &item.Price, &item.Picture, &item.Status, &item.Receive, &item.UserId)
+		if err != nil {
+			return nil, err
+		}
+		cardItem.Item = &item
+		cardItems = append(cardItems, cardItem)
+	}
+	card.Items = cardItems
+	return card, nil
 }
 
 func (r *CardRepository) RemoveFromCard() error {
