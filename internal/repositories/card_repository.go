@@ -12,4 +12,5 @@ type CardRepository interface {
 	CheckItemExistsInCard(ctx context.Context, cardId, itemId int) (*entities.CardItem, error)
 	GetCard(ctx context.Context, userId int) (*entities.Card, error)
 	RemoveFromCard() error
+	UpdateCard(ctx context.Context, id int) error
 }

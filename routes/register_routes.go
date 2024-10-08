@@ -7,10 +7,11 @@ import (
 )
 
 type Handler struct {
-	UserHandler *handlers.UserHandler
-	AuthHandler *handlers.AuthHandler
-	ItemHandler *handlers.ItemHandler
-	CardHandler *handlers.CardHandler
+	UserHandler  *handlers.UserHandler
+	AuthHandler  *handlers.AuthHandler
+	ItemHandler  *handlers.ItemHandler
+	CardHandler  *handlers.CardHandler
+	OrderHandler *handlers.OrderHandler
 }
 
 func RegisterRoutes(router *gin.Engine, handler *Handler) {
@@ -32,6 +33,9 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 	customerCard := customer.Group("/card")
 	customerCard.POST("/:item-id", handler.CardHandler.AddToCard)
 	customerCard.GET("/", handler.CardHandler.GetCard)
+	// customer order
+	customerOrder := customer.Group("/order")
+	customerOrder.POST("/", handler.OrderHandler.StoreOrder)
 
 	// groups seller
 	seller := router.Group("/seller")

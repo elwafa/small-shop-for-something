@@ -63,3 +63,12 @@ func (s *CardService) createCardForUser(ctx context.Context, userId int) (*entit
 func (s *CardService) GetCard(ctx context.Context, userId int) (*entities.Card, error) {
 	return s.repo.GetCard(ctx, userId)
 }
+
+func (s *CardService) CheckPendingCardForUser(ctx context.Context, userId int) (*entities.Card, error) {
+	card, err := s.repo.CheckPendingCardForUser(ctx, userId)
+	return card, err
+}
+
+func (s *CardService) UpdateCardToBeFinished(ctx context.Context, cardId int) error {
+	return s.repo.UpdateCard(ctx, cardId)
+}
