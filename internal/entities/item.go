@@ -6,7 +6,7 @@ type Item struct {
 	Price       float64 `json:"price" validate:"required,numeric"`
 	Picture     string  `json:"picture" validate:"required"`
 	Description string  `json:"description" validate:"required"`
-	Status      string  `json:"status" validate:"required,oneof=New User Sold"`
+	Status      string  `json:"status" validate:"required,oneof=New Used Sold"`
 	UserId      int     `json:"user_id" validate:"required,numeric"`
 	Receive     string  `json:"receive" validate:"required,oneof=PickUp Deliver BothOptionsArePossible"`
 }
