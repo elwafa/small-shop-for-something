@@ -62,4 +62,9 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 	items := seller.Group("/items")
 	items.POST("/", handler.ItemHandler.StoreItem)
 	items.GET("/", handler.ItemHandler.GetItemsForSeller)
+
+	// seller order
+	sellerOrder := seller.Group("/order")
+	sellerOrder.GET("/", handler.OrderHandler.GetOrdersForSeller)
+	sellerOrder.POST("/:order-id/:item-id", handler.OrderHandler.UpdateOrderStatus)
 }
