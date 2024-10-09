@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/elwafa/billion-data/internal/entities"
 	"github.com/elwafa/billion-data/internal/repositories"
+	"github.com/gin-gonic/gin"
 )
 
 type OrderService struct {
@@ -50,4 +51,41 @@ func (s *OrderService) GetOrders(ctx context.Context, userId int) ([]*entities.O
 		return nil, err
 	}
 	return orders, nil
+}
+
+// Update Item Status In Order to be Done
+func (s *OrderService) UpdateItemStatus(ctx *gin.Context, orderId, itemId int) error {
+	err := s.repo.UpdateOrderItemStatus(ctx, orderId, itemId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Update Order Status to be Done
+
+func (s *OrderService) UpdateOrderStatus(ctx context.Context, orderId int) error {
+	// first check if all items in order are done
+	orderItems, err := s.repo.GetOrderItems(ctx, orderId)
+	if err != nil {
+		return err
+	}
+	for _, orderItem := range orderItems {
+		if orderItem.Status != "delivered" {
+			return nil
+		}
+	}
+	// update order status to be delivered
+	return s.repo.UpdateOrderStatus(ctx, orderId)
+}
+
+// get order items for seller which are not delivered yet and assign it to him
+func (s *OrderService) GetOrderItemsForSeller(ctx context.Context, userId int) ([]*entities.OrderItem, error) {
+	// get all orders for user
+	orderItems, err := s.repo.GetItemsForSeller(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	//get all order items which are not delivered yet
+	return orderItems, nil
 }

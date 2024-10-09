@@ -91,3 +91,59 @@ func (r *OrderRepository) getItem(ctx context.Context, itemId int) (*entities.It
 	}
 	return item, nil
 }
+
+func (r *OrderRepository) UpdateOrderItemStatus(ctx context.Context, orderId, itemId int) error {
+	_, err := r.db.ExecContext(ctx, "UPDATE order_items SET status = 'delivered' WHERE order_id = $1 AND item_id = $2", orderId, itemId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *OrderRepository) GetOrderItems(ctx context.Context, orderId int) ([]*entities.OrderItem, error) {
+	rows, err := r.db.QueryContext(ctx, "SELECT id, item_id, status FROM order_items WHERE order_id = $1", orderId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	orderItems := make([]*entities.OrderItem, 0)
+	for rows.Next() {
+		orderItem := &entities.OrderItem{}
+		err = rows.Scan(&orderItem.ID, &orderItem.ItemID, &orderItem.Status)
+		if err != nil {
+			return nil, err
+		}
+		orderItems = append(orderItems, orderItem)
+	}
+	return orderItems, nil
+}
+
+func (r *OrderRepository) UpdateOrderStatus(ctx context.Context, orderId int) error {
+	// first check if all items in order are done
+	_, err := r.db.ExecContext(ctx, "UPDATE orders SET status = 'delivered' WHERE id = $1", orderId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *OrderRepository) GetItemsForSeller(ctx context.Context, userId int) ([]*entities.OrderItem, error) {
+	// get items which are not delivered yet and items which user_id is the seller
+	rows, err := r.db.QueryContext(ctx, "SELECT oi.id,oi.order_id, oi.item_id, oi.status, i.name,i.price,i.picture FROM order_items oi JOIN items i ON oi.item_id = i.id WHERE i.user_id = $1 AND oi.status != 'delivered'", userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	orderItems := make([]*entities.OrderItem, 0)
+	for rows.Next() {
+		orderItem := &entities.OrderItem{}
+		item := &entities.Item{}
+		err = rows.Scan(&orderItem.ID, &orderItem.OrderID, &orderItem.ItemID, &orderItem.Status, &item.Name, &item.Price, &item.Picture)
+		if err != nil {
+			return nil, err
+		}
+		orderItem.Item = item
+		orderItems = append(orderItems, orderItem)
+	}
+	return orderItems, nil
+}
