@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/elwafa/billion-data/internal/entities"
 	"github.com/elwafa/billion-data/internal/services"
 	"github.com/gin-gonic/gin"
@@ -45,6 +44,8 @@ func (h *ItemHandler) StoreItem(c *gin.Context) {
 	description := c.PostForm("description")
 	status := c.PostForm("status")
 	receive := c.PostForm("receive")
+	color := c.PostForm("color")
+	category := c.PostForm("category")
 	// convert price to float64
 	priceFloat, err := strconv.ParseFloat(price, 64)
 	if err != nil {
@@ -54,7 +55,7 @@ func (h *ItemHandler) StoreItem(c *gin.Context) {
 	// get user id from middleware
 	// upload item picture
 	userId := c.MustGet("userId").(int)
-	item, err := entities.NewItem(name, filePath, description, status, receive, priceFloat, userId)
+	item, err := entities.NewItem(name, filePath, description, status, receive, color, category, priceFloat, userId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -95,7 +96,6 @@ func (h *ItemHandler) GetItemsForSeller(c *gin.Context) {
 	// calculate total pages
 	// if total items is not divisible by limit, add 1 to total pages
 	totalPages := total % limit
-	fmt.Println(totalPages, total, limit, "totalPages")
 	if totalPages > 0 {
 		totalPages = total/limit + 1
 	} else {
@@ -131,7 +131,10 @@ func (h *ItemHandler) GetItemsForCustomer(c *gin.Context) {
 		sort = "ASC"
 	}
 	name := c.Query("name")
-	items, total, err := h.service.GetItemsForCustomer(c, limit, page, sort, name)
+	colour := c.Query("colour")
+	category := c.Query("category")
+	price, err := strconv.ParseFloat(c.Query("price"), 64)
+	items, total, err := h.service.GetItemsForCustomer(c, limit, page, sort, name, colour, category, price)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -180,5 +183,22 @@ func (h *ItemHandler) GetItemForCustomer(c *gin.Context) {
 	// add app domain to the picture path
 	item.Picture = h.AppDomain + "/" + item.Picture
 	c.JSON(http.StatusOK, gin.H{"item": item})
+
+}
+
+func (h *ItemHandler) DeleteItem(c *gin.Context) {
+	// delete item from service
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	userId := c.MustGet("userId").(int)
+	err = h.service.DeleteItem(c, id, userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Item deleted successfully"})
 
 }

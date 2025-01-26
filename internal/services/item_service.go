@@ -31,8 +31,8 @@ func (s *ItemService) GetItemsForSeller(ctx context.Context, limit, page, userId
 	return items, total, nil
 }
 
-func (s *ItemService) GetItemsForCustomer(ctx context.Context, limit, page int, sort, name string) ([]entities.Item, int, error) {
-	items, total, err := s.repo.GetPaginationItems(ctx, limit, page, sort, name)
+func (s *ItemService) GetItemsForCustomer(ctx context.Context, limit, page int, sort, name, colour, category string, price float64) ([]entities.Item, int, error) {
+	items, total, err := s.repo.GetPaginationItems(ctx, limit, page, sort, colour, category, name, price)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -45,4 +45,16 @@ func (s *ItemService) GetItemForCustomer(ctx context.Context, id int) (entities.
 		return entities.Item{}, err
 	}
 	return *item, nil
+}
+
+func (s *ItemService) DeleteItem(ctx context.Context, id, userId int) error {
+	// Validate if the item belongs to the user
+	item, err := s.repo.GetItemByUser(ctx, userId, id)
+	if err != nil {
+		return err
+	}
+	if item.ID == 0 {
+		return repositories.ErrRecodeNotFound
+	}
+	return s.repo.DeleteItem(ctx, id)
 }

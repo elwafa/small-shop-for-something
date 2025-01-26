@@ -62,6 +62,7 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 	items := seller.Group("/items")
 	items.POST("/", handler.ItemHandler.StoreItem)
 	items.GET("/", handler.ItemHandler.GetItemsForSeller)
+	items.DELETE("/:id", handler.ItemHandler.DeleteItem)
 
 	// seller order
 	sellerOrder := seller.Group("/order")
