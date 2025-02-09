@@ -142,14 +142,12 @@ func (r *ItemRepo) GetPaginationItems(
 		paramIndex++
 	}
 
-	// If category is not empty, filter by category:
 	if category != "" {
 		conditions = append(conditions, fmt.Sprintf("LOWER(category) = LOWER($%d)", paramIndex))
 		params = append(params, category)
 		paramIndex++
 	}
 
-	// If price is nonzero, filter by exact price (or adjust logic if you need >=, <=, etc.):
 	if price != 0 {
 		conditions = append(conditions, fmt.Sprintf("price = $%d", paramIndex))
 		params = append(params, price)
