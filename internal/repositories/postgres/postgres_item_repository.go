@@ -189,6 +189,8 @@ func (r *ItemRepo) GetPaginationItems(
 	if err := countRow.Scan(&total); err != nil {
 		return nil, 0, err
 	}
+	fmt.Println("Generated SQL:", baseQuery)
+	fmt.Println("Query Parameters:", params)
 
 	// 3) Read the items
 	var items []entities.Item
