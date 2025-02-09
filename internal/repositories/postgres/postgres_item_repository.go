@@ -144,7 +144,7 @@ func (r *ItemRepo) GetPaginationItems(
 
 	// If category is not empty, filter by category:
 	if category != "" {
-		conditions = append(conditions, fmt.Sprintf("category = $%d", paramIndex))
+		conditions = append(conditions, fmt.Sprintf("LOWER(category) = LOWER($%d)", paramIndex))
 		params = append(params, category)
 		paramIndex++
 	}
