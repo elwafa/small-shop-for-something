@@ -182,8 +182,7 @@ func (r *ItemRepo) GetPaginationItems(
 
 	// 2) Query the total count (using the same conditions, but without limit/offset)
 	//    We only pass the parameters related to the WHERE clause (not the last two for limit/offset).
-	conditionParamsCount := params[:paramIndex-2]
-	countRow := r.DB.QueryRowContext(ctx, countQuery, conditionParamsCount...)
+	countRow := r.DB.QueryRowContext(ctx, countQuery, params[:len(params)-2]...)
 
 	// Scan the count
 	var total int
