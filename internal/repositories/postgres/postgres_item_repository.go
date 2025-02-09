@@ -137,7 +137,7 @@ func (r *ItemRepo) GetPaginationItems(
 
 	// If colour is not empty, filter by colour:
 	if colour != "" {
-		conditions = append(conditions, fmt.Sprintf("colour = $%d", paramIndex))
+		conditions = append(conditions, fmt.Sprintf("LOWER(colour) = LOWER($%d)", paramIndex))
 		params = append(params, colour)
 		paramIndex++
 	}
