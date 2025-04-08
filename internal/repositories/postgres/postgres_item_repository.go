@@ -80,9 +80,13 @@ func (r *ItemRepo) GetItem(ctx context.Context, itemID int) (*entities.Item, err
 }
 
 func (r *ItemRepo) GetItemByUser(ctx context.Context, userId, itemID int) (entities.Item, error) {
-	row := r.DB.QueryRowContext(ctx, "SELECT * FROM items WHERE user_id=$1 AND id=$2", userId, itemID)
+	row := r.DB.QueryRowContext(ctx, `
+	SELECT id, name, description, price, picture, status, colour, category, receive, user_id
+	FROM items
+	WHERE user_id=$1 AND id=$2
+`, userId, itemID)
 	var item entities.Item
-	err := row.Scan(&item.UserId, &item.ID)
+	err := row.Scan(&item.ID, &item.Name, &item.Description, &item.Price, &item.Picture, &item.Status, &item.Color, &item.Category, &item.Receive, &item.UserId)
 	if err != nil {
 		return entities.Item{}, err
 	}
