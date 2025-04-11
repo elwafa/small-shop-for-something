@@ -32,7 +32,7 @@ func (s *ItemService) GetItemsForSeller(ctx context.Context, limit, page, userId
 }
 
 func (s *ItemService) GetItemsForCustomer(ctx context.Context, limit, page int, sort, name, colour, category string, price float64) ([]entities.Item, int, error) {
-	items, total, err := s.repo.GetPaginationItems(ctx, limit, page, sort, colour, category, name, price)
+	items, total, err := s.repo.GetPaginationItems(ctx, limit, page, sort, name, colour, category, price)
 	if err != nil {
 		return nil, 0, err
 	}
