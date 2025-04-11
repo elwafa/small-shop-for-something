@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/elwafa/billion-data/internal/entities"
 	"github.com/elwafa/billion-data/internal/services"
 	"github.com/gin-gonic/gin"
@@ -54,6 +55,7 @@ func (h *ItemHandler) StoreItem(c *gin.Context) {
 	}
 	// get user id from middleware
 	// upload item picture
+	fmt.Println(priceFloat, price)
 	userId := c.MustGet("userId").(int)
 	item, err := entities.NewItem(name, filePath, description, status, receive, color, category, priceFloat, userId)
 	if err != nil {
