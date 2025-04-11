@@ -3,7 +3,7 @@ package entities
 type Item struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name" validate:"required"`
-	Price       float64 `json:"price" validate:"required,numeric"`
+	Price       float64 `json:"price" validate:"required"`
 	Picture     string  `json:"picture" validate:"required"`
 	Description string  `json:"description" validate:"required"`
 	Status      string  `json:"status" validate:"required,oneof=New Used Sold"`
